@@ -1,0 +1,63 @@
+{
+  "manifest_version": 3,
+  "name": "GhostEyesSnap - Snapchat Web Enhancer + OSINT",
+  "description": "Screenshot & View Unread Chats, Send as Mobile, OSINT Intelligence Tools, and more! Cross-browser compatible extension with enhanced settings UI and user intelligence gathering.",
+  "version": "3.0.0",
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/logo32.png",
+    "48": "icons/logo48.png",
+    "96": "icons/logo96.png",
+    "128": "icons/logo128.png",
+    "256": "icons/icon256.png"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "32": "icons/logo32.png",
+      "48": "icons/logo48.png",
+      "96": "icons/logo96.png",
+      "128": "icons/logo128.png"
+    },
+    "default_title": "GhostEyesSnap v3.0 — OSINT Enhanced"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://*.snapchat.com/*"
+      ],
+      "css": [
+        "build/script.css"
+      ],
+      "js": [
+        "build/inject.js"
+      ],
+      "run_at": "document_start",
+      "all_frames": false
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "build/script.js",
+        "build/browser-compat.js",
+        "build/inject-settings.js",
+        "build/osint.js"
+      ],
+      "matches": [
+        "https://*.snapchat.com/*"
+      ]
+    }
+  ],
+  "permissions": [
+    "storage",
+    "activeTab"
+  ],
+  "host_permissions": [
+    "https://*.snapchat.com/*"
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'"
+  }
+}

@@ -1,0 +1,1115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GhostEyesSnap</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg-primary: #0f0a1a;
+      --bg-secondary: #1a1128;
+      --bg-card: #231838;
+      --bg-hover: #2d1f45;
+      --accent: #7c3aed;
+      --accent-light: #a78bfa;
+      --accent-glow: rgba(124, 58, 237, 0.3);
+      --cyan: #22d3ee;
+      --cyan-glow: rgba(34, 211, 238, 0.2);
+      --text-primary: #f1f0f5;
+      --text-secondary: #a8a0b8;
+      --text-dim: #6b5f80;
+      --success: #34d399;
+      --warning: #fbbf24;
+      --danger: #f87171;
+      --border: rgba(124, 58, 237, 0.15);
+      --osint-color: #f59e0b;
+    }
+
+    body {
+      width: 420px;
+      min-height: 560px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      overflow-x: hidden;
+    }
+
+    /* Header */
+    .header {
+      background: linear-gradient(135deg, #1a1128 0%, #2d1f45 50%, #1a1128 100%);
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .header::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, var(--accent-glow) 0%, transparent 60%);
+      animation: headerGlow 8s ease-in-out infinite;
+    }
+
+    @keyframes headerGlow {
+      0%, 100% { transform: translate(0, 0); }
+      50% { transform: translate(10%, 10%); }
+    }
+
+    .header-content {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .logo {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      border: 2px solid var(--accent);
+      box-shadow: 0 0 20px var(--accent-glow);
+    }
+
+    .header-text h1 {
+      font-size: 17px;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--accent-light), var(--cyan));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: -0.3px;
+    }
+
+    .header-text .version {
+      font-size: 11px;
+      color: var(--text-dim);
+      margin-top: 2px;
+    }
+
+    .status-badge {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+      background: rgba(52, 211, 153, 0.1);
+      color: var(--success);
+      border: 1px solid rgba(52, 211, 153, 0.2);
+    }
+
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--success);
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    /* Tabs */
+    .tabs {
+      display: flex;
+      padding: 0 8px;
+      background: var(--bg-secondary);
+      border-bottom: 1px solid var(--border);
+      overflow-x: auto;
+    }
+
+    .tabs::-webkit-scrollbar { height: 0; }
+
+    .tab {
+      flex: 1;
+      min-width: 0;
+      padding: 10px 6px;
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--text-dim);
+      background: none;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+      text-align: center;
+      letter-spacing: 0.3px;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .tab:hover {
+      color: var(--text-secondary);
+    }
+
+    .tab.active {
+      color: var(--accent-light);
+    }
+
+    .tab.active::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 20%;
+      width: 60%;
+      height: 2px;
+      background: linear-gradient(90deg, var(--accent), var(--cyan));
+      border-radius: 2px;
+    }
+
+    .tab-icon {
+      display: block;
+      font-size: 14px;
+      margin-bottom: 2px;
+    }
+
+    /* Tab Content */
+    .tab-content {
+      display: none;
+      padding: 14px;
+      max-height: 400px;
+      overflow-y: auto;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .tab-content::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    .tab-content::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .tab-content::-webkit-scrollbar-thumb {
+      background: var(--accent);
+      border-radius: 4px;
+    }
+
+    /* Section */
+    .section {
+      margin-bottom: 14px;
+    }
+
+    .section-title {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 8px;
+      padding-left: 2px;
+    }
+
+    /* Setting Item */
+    .setting-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 9px 11px;
+      background: var(--bg-card);
+      border-radius: 10px;
+      margin-bottom: 5px;
+      border: 1px solid transparent;
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+
+    .setting-item:hover {
+      border-color: var(--border);
+      background: var(--bg-hover);
+    }
+
+    .setting-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .setting-icon {
+      width: 30px;
+      height: 30px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+
+    .setting-icon.privacy { background: rgba(124, 58, 237, 0.15); }
+    .setting-icon.media { background: rgba(34, 211, 238, 0.15); }
+    .setting-icon.chat { background: rgba(251, 191, 36, 0.15); }
+    .setting-icon.presence { background: rgba(52, 211, 153, 0.15); }
+    .setting-icon.advanced { background: rgba(248, 113, 113, 0.15); }
+    .setting-icon.osint { background: rgba(245, 158, 11, 0.15); }
+
+    .setting-text h3 {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .setting-text p {
+      font-size: 10px;
+      color: var(--text-dim);
+      margin-top: 1px;
+    }
+
+    /* Toggle Switch */
+    .toggle {
+      position: relative;
+      width: 38px;
+      height: 20px;
+      flex-shrink: 0;
+    }
+
+    .toggle input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .toggle-slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      transition: 0.3s;
+    }
+
+    .toggle-slider::before {
+      content: '';
+      position: absolute;
+      height: 14px;
+      width: 14px;
+      left: 2px;
+      bottom: 2px;
+      background: var(--text-dim);
+      border-radius: 50%;
+      transition: 0.3s;
+    }
+
+    .toggle input:checked + .toggle-slider {
+      background: var(--accent);
+      border-color: var(--accent);
+      box-shadow: 0 0 12px var(--accent-glow);
+    }
+
+    .toggle input:checked + .toggle-slider::before {
+      transform: translateX(18px);
+      background: white;
+    }
+
+    /* Radio Group */
+    .radio-group {
+      display: flex;
+      gap: 3px;
+      background: var(--bg-secondary);
+      border-radius: 8px;
+      padding: 3px;
+      flex-shrink: 0;
+    }
+
+    .radio-option {
+      padding: 4px 8px;
+      font-size: 9px;
+      font-weight: 600;
+      color: var(--text-dim);
+      border: none;
+      background: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .radio-option:hover {
+      color: var(--text-secondary);
+    }
+
+    .radio-option.active {
+      background: var(--accent);
+      color: white;
+      box-shadow: 0 0 8px var(--accent-glow);
+    }
+
+    /* ===== OSINT Tab Styles ===== */
+    .osint-search-box {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+
+    .osint-search-box input {
+      flex: 1;
+      padding: 10px 14px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text-primary);
+      font-size: 13px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .osint-search-box input::placeholder {
+      color: var(--text-dim);
+    }
+
+    .osint-search-box input:focus {
+      border-color: var(--osint-color);
+      box-shadow: 0 0 12px rgba(245, 158, 11, 0.15);
+    }
+
+    .osint-search-btn {
+      padding: 10px 16px;
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      border: none;
+      border-radius: 10px;
+      color: #000;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+
+    .osint-search-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 16px rgba(245, 158, 11, 0.3);
+    }
+
+    .osint-search-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .osint-result-card {
+      background: var(--bg-card);
+      border-radius: 12px;
+      padding: 14px;
+      margin-bottom: 10px;
+      border: 1px solid var(--border);
+      animation: fadeIn 0.3s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .osint-profile {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .osint-avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--cyan));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      flex-shrink: 0;
+      border: 2px solid var(--osint-color);
+    }
+
+    .osint-profile-info h3 {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .osint-profile-info p {
+      font-size: 11px;
+      color: var(--text-secondary);
+      margin-top: 2px;
+    }
+
+    .osint-badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 9px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .osint-badge.available {
+      background: rgba(52, 211, 153, 0.15);
+      color: var(--success);
+      border: 1px solid rgba(52, 211, 153, 0.2);
+    }
+
+    .osint-badge.taken {
+      background: rgba(248, 113, 113, 0.15);
+      color: var(--danger);
+      border: 1px solid rgba(248, 113, 113, 0.2);
+    }
+
+    .osint-badge.verified {
+      background: rgba(34, 211, 238, 0.15);
+      color: var(--cyan);
+      border: 1px solid rgba(34, 211, 238, 0.2);
+    }
+
+    .osint-details {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+    }
+
+    .osint-detail-item {
+      background: var(--bg-secondary);
+      border-radius: 8px;
+      padding: 8px 10px;
+    }
+
+    .osint-detail-item .label {
+      font-size: 9px;
+      font-weight: 700;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .osint-detail-item .value {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-top: 2px;
+    }
+
+    .osint-actions {
+      display: flex;
+      gap: 6px;
+      margin-top: 10px;
+    }
+
+    .osint-action-btn {
+      flex: 1;
+      padding: 6px 10px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--bg-secondary);
+      color: var(--text-secondary);
+      font-size: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: center;
+    }
+
+    .osint-action-btn:hover {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: white;
+    }
+
+    .osint-quick-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      margin-top: 10px;
+    }
+
+    .osint-quick-btn {
+      padding: 10px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: center;
+    }
+
+    .osint-quick-btn:hover {
+      border-color: var(--osint-color);
+      background: var(--bg-hover);
+    }
+
+    .osint-quick-btn .icon {
+      font-size: 20px;
+      margin-bottom: 4px;
+    }
+
+    .osint-quick-btn .text {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    .osint-history-title {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin: 14px 0 8px;
+    }
+
+    .osint-history-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 6px 10px;
+      background: var(--bg-card);
+      border-radius: 8px;
+      margin-bottom: 4px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .osint-history-item:hover {
+      background: var(--bg-hover);
+    }
+
+    .osint-history-item .username {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .osint-history-item .time {
+      font-size: 10px;
+      color: var(--text-dim);
+    }
+
+    .osint-loader {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 30px;
+      color: var(--osint-color);
+    }
+
+    .osint-spinner {
+      width: 24px;
+      height: 24px;
+      border: 3px solid var(--border);
+      border-top: 3px solid var(--osint-color);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-right: 10px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .osint-empty {
+      text-align: center;
+      padding: 20px;
+      color: var(--text-dim);
+    }
+
+    .osint-empty .icon {
+      font-size: 32px;
+      margin-bottom: 8px;
+    }
+
+    .osint-empty p {
+      font-size: 12px;
+    }
+
+    .osint-error {
+      background: rgba(248, 113, 113, 0.1);
+      border: 1px solid rgba(248, 113, 113, 0.2);
+      border-radius: 10px;
+      padding: 12px;
+      color: var(--danger);
+      font-size: 12px;
+      text-align: center;
+    }
+
+    /* Footer */
+    .footer {
+      padding: 10px 14px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--bg-secondary);
+    }
+
+    .footer-link {
+      font-size: 11px;
+      color: var(--text-dim);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .footer-link:hover {
+      color: var(--accent-light);
+    }
+
+    .footer-actions {
+      display: flex;
+      gap: 6px;
+    }
+
+    .footer-btn {
+      padding: 4px 10px;
+      font-size: 10px;
+      font-weight: 600;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .footer-btn:hover {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: white;
+    }
+
+    .footer-btn.danger:hover {
+      background: var(--danger);
+      border-color: var(--danger);
+    }
+
+    /* Notification toast */
+    .toast {
+      position: fixed;
+      bottom: 50px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: var(--accent);
+      color: white;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      opacity: 0;
+      transition: all 0.3s;
+      pointer-events: none;
+      z-index: 100;
+      box-shadow: 0 4px 16px var(--accent-glow);
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* Browser detect badge */
+    .browser-badge {
+      font-size: 10px;
+      padding: 2px 8px;
+      border-radius: 4px;
+      background: var(--bg-card);
+      color: var(--text-dim);
+      border: 1px solid var(--border);
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <div class="header">
+    <div class="header-content">
+      <img class="logo" src="icons/logo128.png" alt="GhostEyesSnap">
+      <div class="header-text">
+        <h1>GhostEyesSnap</h1>
+        <span class="version">v3.0.0 — <span id="browserName">Detecting...</span></span>
+      </div>
+      <div class="status-badge">
+        <span class="status-dot"></span>
+        Active
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <button class="tab active" data-tab="privacy"><span class="tab-icon">🛡️</span>Privacy</button>
+    <button class="tab" data-tab="media"><span class="tab-icon">🖼️</span>Media</button>
+    <button class="tab" data-tab="chat"><span class="tab-icon">💬</span>Chat</button>
+    <button class="tab" data-tab="osint"><span class="tab-icon">🔍</span>OSINT</button>
+    <button class="tab" data-tab="advanced"><span class="tab-icon">⚡</span>Advanced</button>
+  </div>
+
+  <!-- Privacy Tab -->
+  <div class="tab-content active" id="tab-privacy">
+    <div class="section">
+      <div class="section-title">Detection Bypass</div>
+      <div class="setting-item" data-setting="ALLOW_SCREENSHOT">
+        <div class="setting-info">
+          <div class="setting-icon privacy">📸</div>
+          <div class="setting-text">
+            <h3>Screenshot Bypass</h3>
+            <p>Bypass screenshot detection</p>
+          </div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" data-key="ALLOW_SCREENSHOT">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <div class="setting-item" data-setting="ALWAYS_PRESENT">
+        <div class="setting-info">
+          <div class="setting-icon privacy">👁️</div>
+          <div class="setting-text">
+            <h3>Always Present</h3>
+            <p>Bypass presence detection</p>
+          </div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" data-key="ALWAYS_PRESENT">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <div class="setting-item" data-setting="PREVENT_CHAT_READ_RECEIPTS">
+        <div class="setting-info">
+          <div class="setting-icon privacy">💬</div>
+          <div class="setting-text">
+            <h3>Unread Chats</h3>
+            <p>Prevent read receipt delivery</p>
+          </div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" data-key="PREVENT_CHAT_READ_RECEIPTS">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <div class="setting-item" data-setting="PREVENT_STORY_READ_RECEIPTS">
+        <div class="setting-info">
+          <div class="setting-icon privacy">📖</div>
+          <div class="setting-text">
+            <h3>Story Anonymity</h3>
+            <p>Block story view receipts</p>
+          </div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" data-key="PREVENT_STORY_READ_RECEIPTS">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+    </div>
+    <div class="section">
+      <div class="section-title">Typing Status</div>
+      <div class="setting-item" data-setting="PREVENT_TYPING_NOTIFICATION">
+        <div class="setting-info">
+          <div class="setting-icon presence">⌨️</div>
+          <div class="setting-text">
+            <h3>Hide Typing</h3>
+            <p>Hide typing indicator</p>
+          </div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" data-key="PREVENT_TYPING_NOTIFICATION">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <div class="setting-item" data-setting="PREVENT_TYPING">
+        <div class="setting-info">
+          <div class="setting-icon presence">🔕</div>
+          <div class="setting-text">
+            <h3>Block Typing Push</h3>
+            <p>Block typing notifications</p>
+          </div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" data-key="PREVENT_TYPING">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <!-- Media Tab -->
+  <div class="tab-content" id="tab-media">
+    <div class="section">
+      <div class="section-title">Media Saving</div>
+      <div class="setting-item" data-setting="SAVE_IMAGE">
+        <div class="setting-info">
+          <div class="setting-icon media">💾</div>
+          <div class="setting-text">
+            <h3>Save Media</h3>
+            <p>Right-click to save images/videos</p>
+          </div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" data-key="SAVE_IMAGE">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <div class="setting-item" data-setting="UPLOAD_SNAPS">
+        <div class="setting-info">
+          <div class="setting-icon media">📤</div>
+          <div class="setting-text">
+            <h3>Upload as Snaps</h3>
+            <p>Send images as snap uploads</p>
+          </div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" data-key="UPLOAD_SNAPS">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <div class="setting-item" data-setting="UNLIMITED_FILE_SIZE">
+        <div class="setting-info">
+          <div class="setting-icon media">📁</div>
+          <div class="setting-text">
+            <h3>Unrestricted Files</h3>
+            <p>Send any file size</p>
+          </div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" data-key="UNLIMITED_FILE_SIZE">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+    </div>
+    <div class="section">
+      <div class="section-title">Mobile Appearance</div>
+      <div class="setting-item" data-setting="SNAP_AS_MOBILE">
+        <div class="setting-info">
+          <div class="setting-icon media">📱</div>
+          <div class="setting-text">
+            <h3>Send as Mobile</h3>
+            <p>Snaps appear from mobile</p>
+          </div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" data-key="SNAP_AS_MOBILE">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chat Tab -->
+  <div class="tab-content" id="tab-chat">
+    <div class="section">
+      <div class="section-title">Chat Handling</div>
+      <div class="setting-item">
+        <div class="setting-info">
+          <div class="setting-icon chat">⚙️</div>
+          <div class="setting-text">
+            <h3>Chat Mode</h3>
+            <p>How to handle messages</p>
+          </div>
+        </div>
+        <div class="radio-group" data-setting="CHAT_HANDLING">
+          <button class="radio-option active" data-value="DEFAULT">Default</button>
+          <button class="radio-option" data-value="AUTO_SAVE">Auto Save</button>
+          <button class="radio-option" data-value="UNREAD">Unread</button>
+        </div>
+      </div>
+      <div class="setting-item" data-setting="SEND_UNSAVEABLE_MESSAGES">
+        <div class="setting-info">
+          <div class="setting-icon chat">🔒</div>
+          <div class="setting-text">
+            <h3>Unsaveable Messages</h3>
+            <p>Send as non-saveable</p>
+          </div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" data-key="SEND_UNSAVEABLE_MESSAGES">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+    </div>
+    <div class="section">
+      <div class="section-title">Notifications</div>
+      <div class="setting-item" data-setting="HALF_SWIPE_NOTIFICATION">
+        <div class="setting-info">
+          <div class="setting-icon chat">👆</div>
+          <div class="setting-text">
+            <h3>Half-Swipe Alert</h3>
+            <p>Notify on half-swipe</p>
+          </div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" data-key="HALF_SWIPE_NOTIFICATION">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <div class="setting-item" data-setting="OPEN_CHAT_NOTIFICATION">
+        <div class="setting-info">
+          <div class="setting-icon chat">📂</div>
+          <div class="setting-text">
+            <h3>Open Chat Alert</h3>
+            <p>Notify on chat open</p>
+          </div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" data-key="OPEN_CHAT_NOTIFICATION">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <div class="setting-item" data-setting="SHOW_STREAKS">
+        <div class="setting-info">
+          <div class="setting-icon chat">🔥</div>
+          <div class="setting-text">
+            <h3>Show Streaks</h3>
+            <p>Display streak count</p>
+          </div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" data-key="SHOW_STREAKS">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <!-- OSINT Tab -->
+  <div class="tab-content" id="tab-osint">
+    <div class="section">
+      <div class="section-title">Username Lookup</div>
+      <div class="osint-search-box">
+        <input type="text" id="osintUsername" placeholder="Enter Snapchat username..." autocomplete="off" spellcheck="false">
+        <button class="osint-search-btn" id="osintSearchBtn">Search</button>
+      </div>
+      <div id="osintResults"></div>
+    </div>
+    <div class="section">
+      <div class="section-title">Quick Tools</div>
+      <div class="osint-quick-actions">
+        <div class="osint-quick-btn" id="osintCheckAvail">
+          <div class="icon">✅</div>
+          <div class="text">Check Availability</div>
+        </div>
+        <div class="osint-quick-btn" id="osintProfileScan">
+          <div class="icon">👤</div>
+          <div class="text">Profile Scanner</div>
+        </div>
+        <div class="osint-quick-btn" id="osintStoryViewer">
+          <div class="icon">📖</div>
+          <div class="text">Story Viewer</div>
+        </div>
+        <div class="osint-quick-btn" id="osintMapLookup">
+          <div class="icon">📍</div>
+          <div class="text">Snap Map</div>
+        </div>
+      </div>
+    </div>
+    <div class="section">
+      <div class="osint-history-title">Search History</div>
+      <div id="osintHistory"></div>
+    </div>
+  </div>
+
+  <!-- Advanced Tab -->
+  <div class="tab-content" id="tab-advanced">
+    <div class="section">
+      <div class="section-title">Bitmoji Presence</div>
+      <div class="setting-item">
+        <div class="setting-info">
+          <div class="setting-icon advanced">👻</div>
+          <div class="setting-text">
+            <h3>Bitmoji Mode</h3>
+            <p>Control bitmoji appearance</p>
+          </div>
+        </div>
+        <div class="radio-group" data-setting="BITMOJI_PRESENCE">
+          <button class="radio-option active" data-value="DEFAULT">Default</button>
+          <button class="radio-option" data-value="HIDE">Hidden</button>
+          <button class="radio-option" data-value="MOBILE">Mobile</button>
+        </div>
+      </div>
+    </div>
+    <div class="section">
+      <div class="section-title">Experimental</div>
+      <div class="setting-item" data-setting="PRIVATE_STORIES">
+        <div class="setting-info">
+          <div class="setting-icon advanced">🔐</div>
+          <div class="setting-text">
+            <h3>Private Stories</h3>
+            <p>Interact with private stories</p>
+          </div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" data-key="PRIVATE_STORIES">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <div class="setting-item" data-setting="ALLOW_CROSS_TAB">
+        <div class="setting-info">
+          <div class="setting-icon advanced">🔀</div>
+          <div class="setting-text">
+            <h3>Multiple Tabs</h3>
+            <p>Allow multiple Snapchat tabs</p>
+          </div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" data-key="ALLOW_CROSS_TAB">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <div class="setting-item" data-setting="STEALTH_MODE">
+        <div class="setting-info">
+          <div class="setting-icon advanced">🥷</div>
+          <div class="setting-text">
+            <h3>Stealth Mode</h3>
+            <p>Full privacy: no typing, no receipts, no presence</p>
+          </div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" data-key="STEALTH_MODE">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <div class="setting-item" data-setting="ANTI_BLUR">
+        <div class="setting-info">
+          <div class="setting-icon advanced">👁️‍🗨️</div>
+          <div class="setting-text">
+            <h3>Anti-Blur</h3>
+            <p>Remove blur when tab is unfocused</p>
+          </div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" data-key="ANTI_BLUR">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div class="toast" id="toast">Setting updated!</div>
+
+  <!-- Footer -->
+  <div class="footer">
+    <a class="footer-link" href="https://github.com/Ismail-Benali/GhostEyesSnap" target="_blank">GitHub</a>
+    <div class="footer-actions">
+      <button class="footer-btn danger" id="resetBtn">Reset</button>
+      <button class="footer-btn" id="exportBtn">Export</button>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
